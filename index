@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EcoScore — Doğa Puanı</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0d1f0f;--moss:#3d6b47;--fern:#5a9a68;--lime:#8dc98a;
+  --amber:#e8a02a;--coral:#e05c3a;--cream:#faf8f2;--gold:#c9992a;
+  --r:12px;--r2:18px;
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:#1a2a1a;display:flex;align-items:center;justify-content:center}
+.phone-frame{
+  width:390px;height:844px;
+  background:var(--cream);
+  border-radius:44px;
+  overflow:hidden;
+  box-shadow:0 40px 80px rgba(0,0,0,.6),0 0 0 10px #111,0 0 0 12px #333;
+  display:flex;flex-direction:column;
+  position:relative;
+}
+/* Notch */
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#111;border-radius:0 0 20px 20px;z-index:100}
+.shell{display:flex;height:100%;overflow:hidden;padding-top:34px}
+.sidebar{width:64px;background:#0d1f0f;display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:5px;flex-shrink:0}
+.logo-mark{width:34px;height:34px;background:var(--fern);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:10px}
+.sib-wrap{display:flex;flex-direction:column;align-items:center;width:100%}
+.sib{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;border:none;background:none;color:white}
+.sib.active{background:var(--moss)}
+.sib-label{font-size:9px;color:#6a8a6a;margin-top:1px;text-align:center;line-height:1.2;width:100%}
+.main{flex:1;overflow:hidden}
+.page{display:none;height:100%;overflow-y:auto;animation:fin .3s ease}
+.page.active{display:block}
+.page::-webkit-scrollbar{width:3px}
+.page::-webkit-scrollbar-thumb{background:rgba(90,154,104,.3);border-radius:3px}
+@keyframes fin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes shake{0%,100%{transform:translateX(0)}30%{transform:translateX(-6px)}70%{transform:translateX(6px)}}
+
+/* HOME */
+.home-top{background:linear-gradient(155deg,#1a3320,#1e4a50);padding:26px 22px 18px;position:relative;overflow:hidden}
+.home-top::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 65% 40%,rgba(141,201,138,.1),transparent 60%)}
+.eco-brand{display:flex;align-items:center;gap:9px;margin-bottom:16px}
+.eco-logo{font-family:'DM Serif Display',serif;font-size:25px;color:white}
+.eco-logo span{color:var(--lime)}
+.eco-badge{background:rgba(141,201,138,.2);border:1px solid rgba(141,201,138,.4);border-radius:20px;padding:3px 9px;font-size:11px;color:var(--lime);font-weight:500}
+.dp-row{display:flex;align-items:flex-end;gap:10px;margin-bottom:5px}
+.dp-num{font-family:'DM Serif Display',serif;font-size:48px;color:white;line-height:1}
+.dp-unit{font-size:12px;color:var(--lime);font-weight:600;margin-bottom:3px}
+.dp-sub{font-size:11px;color:rgba(255,255,255,.45)}
+.level-row{display:flex;align-items:center;gap:9px;margin-top:9px}
+.level-pill{background:var(--amber);color:#0d1f0f;border-radius:20px;padding:4px 11px;font-size:12px;font-weight:600}
+.lvl-bar{flex:1;height:5px;background:rgba(255,255,255,.12);border-radius:10px;overflow:hidden}
+.lvl-fill{height:100%;background:linear-gradient(90deg,var(--lime),var(--amber));width:67%;border-radius:10px}
+.lvl-pct{font-size:11px;color:rgba(255,255,255,.45)}
+.home-body{padding:16px 20px}
+.sec{font-size:10px;font-weight:600;color:#4a6a4a;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.impact-row{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:20px}
+.imp-card{background:white;border-radius:var(--r);padding:12px 8px;text-align:center;border:.5px solid rgba(90,154,104,.15)}
+.imp-icon{font-size:20px;margin-bottom:4px}
+.imp-val{font-size:17px;font-weight:600;color:var(--moss)}
+.imp-lbl{font-size:9px;color:#7a8a7a;margin-top:1px}
+.milestone-box{background:linear-gradient(135deg,#1a3320,#1e4a50);border-radius:var(--r2);padding:14px 16px;margin-bottom:18px;position:relative;overflow:hidden}
+.milestone-box::after{content:'🌳';position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:36px;opacity:.18}
+.ml-label{font-size:10px;color:var(--lime);font-weight:600;margin-bottom:3px}
+.ml-title{font-size:14px;font-weight:600;color:white;margin-bottom:8px}
+.ml-bar{height:6px;background:rgba(255,255,255,.1);border-radius:10px;overflow:hidden;margin-bottom:4px}
+.ml-fill{height:100%;background:linear-gradient(90deg,var(--lime),var(--amber));border-radius:10px}
+.ml-sub{font-size:11px;color:rgba(255,255,255,.4)}
+.daily-card{background:white;border-radius:var(--r2);padding:14px 16px;display:flex;align-items:center;gap:12px;border:.5px solid rgba(232,160,42,.3);margin-bottom:18px}
+.daily-info{flex:1}
+.daily-tag{font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.daily-title{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:1px}
+.daily-sub{font-size:11px;color:#7a8a7a}
+.daily-play{background:#1a3320;color:white;border:none;border-radius:9px;padding:9px 13px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.cat-btn{border-radius:var(--r2);padding:15px 13px;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;text-align:left}
+.cat-btn .cb-icon{font-size:22px;margin-bottom:6px;display:block}
+.cat-btn .cb-name{font-size:13px;font-weight:700;display:block;margin-bottom:1px}
+.cat-btn .cb-count{font-size:11px;opacity:.6}
+.cb-birds{background:#dbeafe;color:#1e3a8a}
+.cb-mammals{background:#fef3c7;color:#78350f}
+.cb-flora{background:#dcfce7;color:#14532d}
+.cb-ecology{background:#ede9fe;color:#4c1d95}
+
+/* KATEGORİ SEÇİM */
+.cat-header{background:linear-gradient(155deg,#1a3320,#1e4a50);padding:22px 22px 18px;text-align:center}
+.cat-header-title{font-family:'DM Serif Display',serif;font-size:22px;color:white;margin-bottom:3px}
+.cat-header-sub{font-size:12px;color:rgba(255,255,255,.45)}
+.cat-body{padding:16px 18px}
+.diff-box{background:white;border-radius:var(--r2);padding:16px;border:.5px solid rgba(90,154,104,.2);margin-bottom:14px}
+.diff-box-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.diff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.diff-btn{padding:13px 6px;border-radius:var(--r);cursor:pointer;font-family:'DM Sans',sans-serif;text-align:center;border:2px solid transparent}
+.diff-btn.easy{background:#f0fdf4;border-color:#22c55e;color:#15803d}
+.diff-btn.medium{background:#fffbeb;border-color:#f59e0b;color:#b45309}
+.diff-btn.hard{background:#fff1f0;border-color:#ef4444;color:#b91c1c}
+.diff-icon{font-size:20px;margin-bottom:4px}
+.diff-name{font-size:12px;font-weight:700;display:block;margin-bottom:1px}
+.diff-pts{font-size:11px;opacity:.7}
+
+/* QUIZ */
+.quiz-top{background:linear-gradient(155deg,#1a3320,#1e4a50);padding:16px 20px 20px}
+.quiz-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
+.quiz-pills{display:flex;gap:6px;align-items:center}
+.cat-pill{background:rgba(141,201,138,.2);border:1px solid rgba(141,201,138,.3);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--lime);font-weight:500}
+.d-pill{border-radius:20px;padding:3px 9px;font-size:11px;font-weight:700}
+.d-pill.easy{background:rgba(34,197,94,.2);color:#86efac}
+.d-pill.medium{background:rgba(245,158,11,.2);color:#fcd34d}
+.d-pill.hard{background:rgba(239,68,68,.2);color:#fca5a5}
+.timer-wrap{position:relative;width:44px;height:44px}
+.timer-wrap svg{transform:rotate(-90deg)}
+.timer-wrap circle{fill:none;stroke-width:3}
+.t-bg{stroke:rgba(255,255,255,.1)}
+.t-fill{stroke:var(--lime);stroke-linecap:round;stroke-dasharray:120;transition:stroke-dashoffset .9s linear}
+.t-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white}
+.q-dots{display:flex;gap:4px;margin-bottom:12px}
+.q-dot{flex:1;height:4px;border-radius:3px;background:rgba(255,255,255,.12)}
+.q-dot.done{background:var(--lime)}
+.q-dot.cur{background:var(--amber)}
+.score-live{text-align:center}
+.score-big{font-family:'DM Serif Display',serif;font-size:30px;color:white}
+.score-sub{font-size:10px;color:rgba(255,255,255,.4);margin-top:1px}
+.quiz-card{background:white;margin:0 16px;margin-top:-12px;border-radius:var(--r2);overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,.08)}
+.q-img{width:100%;height:145px;object-fit:cover;display:block}
+.q-img-ph{width:100%;height:145px;display:flex;align-items:center;justify-content:center;font-size:50px;background:linear-gradient(135deg,#dbeafe,#dcfce7)}
+.q-body{padding:14px 16px 12px}
+.q-badge{display:inline-block;background:#f0fdf4;color:var(--moss);border-radius:20px;padding:3px 9px;font-size:11px;font-weight:600;margin-bottom:9px}
+.streak-bar{background:#fef3c7;border-radius:8px;padding:6px 10px;font-size:12px;color:#78350f;font-weight:600;margin-bottom:8px;display:none;align-items:center;gap:5px}
+.q-text{font-size:15px;font-weight:600;color:var(--ink);line-height:1.4}
+.opts{display:grid;gap:7px;padding:8px 16px 14px}
+.opt{display:flex;align-items:center;gap:10px;background:#f4f7f4;border:1.5px solid #c8dcc8;border-radius:var(--r);padding:12px 13px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;color:var(--ink);text-align:left;width:100%}
+.opt-ltr{width:26px;height:26px;border-radius:50%;background:#e0ece0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;color:var(--moss)}
+.opt.correct{background:#166534;border-color:#166534;color:white;animation:pop .3s ease}
+.opt.correct .opt-ltr{background:rgba(255,255,255,.25);color:white}
+.opt.wrong{background:#991b1b;border-color:#991b1b;color:white;animation:shake .3s ease}
+.opt.wrong .opt-ltr{background:rgba(255,255,255,.2);color:white}
+.opt:disabled{cursor:default}
+.dp-award{background:linear-gradient(135deg,#1a3320,#1e4a50);border-radius:var(--r);padding:11px 14px;margin:0 16px;display:none;align-items:center;gap:11px}
+.dp-award.show{display:flex;animation:fin .3s ease}
+.award-pts{font-family:'DM Serif Display',serif;font-size:24px;color:var(--lime)}
+.award-txt{font-size:12px;color:rgba(255,255,255,.7);line-height:1.4}
+.award-form{font-size:11px;color:var(--lime);margin-top:2px}
+.next-btn{width:calc(100% - 32px);margin:9px 16px 16px;background:var(--moss);color:white;border:none;border-radius:var(--r);padding:12px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:none}
+.next-btn.show{display:block;animation:fin .3s ease}
+
+/* ETKİ */
+.impact-top{background:linear-gradient(155deg,#1e4a50,#0d1f0f);padding:24px 22px;text-align:center}
+.impact-title{font-family:'DM Serif Display',serif;font-size:24px;color:white;margin-bottom:4px}
+.impact-sub{font-size:12px;color:rgba(255,255,255,.45)}
+.global-grid{background:rgba(255,255,255,.05);border:1px solid rgba(141,201,138,.2);border-radius:var(--r2);padding:13px;margin-top:13px;display:grid;grid-template-columns:repeat(3,1fr);gap:9px;text-align:center}
+.gp-val{font-family:'DM Serif Display',serif;font-size:20px;color:var(--lime)}
+.gp-lbl{font-size:10px;color:rgba(255,255,255,.38);margin-top:1px}
+.impact-body{padding:16px 20px}
+.threshold-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.th{background:white;border-radius:var(--r2);padding:14px 16px;border:.5px solid rgba(90,154,104,.15);display:flex;align-items:center;gap:12px}
+.th.done{border-color:var(--fern);background:#f0fdf4}
+.th.next{border:2px solid var(--amber);background:#fffbeb}
+.th-icon{font-size:26px;flex-shrink:0}
+.th-body{flex:1}
+.th-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:1px}
+.th-desc{font-size:11px;color:#7a8a7a;margin-bottom:5px;line-height:1.4}
+.th-pts{font-size:11px;color:#7a8a7a}
+.th-bar{height:4px;background:rgba(0,0,0,.06);border-radius:10px;overflow:hidden;margin-top:6px}
+.th-fill{height:100%;border-radius:10px}
+.th-stat{font-size:12px;font-weight:600;flex-shrink:0;min-width:30px;text-align:right}
+.th.done .th-stat{color:var(--moss)}
+.th.next .th-stat{color:var(--amber)}
+.log-box{background:white;border-radius:var(--r2);padding:14px 16px;border:.5px solid rgba(90,154,104,.15)}
+.log-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:.5px solid rgba(90,154,104,.08)}
+.log-row:last-child{border-bottom:none}
+.log-ic{font-size:17px}
+.log-info{flex:1}
+.log-t{font-size:13px;font-weight:600;color:var(--ink)}
+.log-d{font-size:11px;color:#7a8a7a;margin-top:1px}
+.log-pts{font-size:12px;font-weight:700;color:var(--fern)}
+
+/* LİDERLİK */
+.lb-top{background:linear-gradient(155deg,#2d1a40,#1a2d40);padding:20px 22px 24px;text-align:center}
+.lb-title{font-family:'DM Serif Display',serif;font-size:23px;color:white;margin-bottom:3px}
+.lb-tabs{display:flex;background:rgba(255,255,255,.08);border-radius:20px;padding:3px;margin-top:11px}
+.lb-tab{flex:1;padding:6px;border-radius:15px;font-size:12px;font-weight:600;color:rgba(255,255,255,.5);border:none;background:none;cursor:pointer;font-family:'DM Sans',sans-serif}
+.lb-tab.active{background:white;color:var(--ink)}
+.lb-podium{display:flex;align-items:flex-end;justify-content:center;gap:7px;padding:16px 20px;background:white;border-bottom:.5px solid rgba(0,0,0,.05)}
+.pod{display:flex;flex-direction:column;align-items:center;gap:4px}
+.pod-av{border-radius:50%;display:flex;align-items:center;justify-content:center;border:3px solid transparent}
+.pod.first .pod-av{width:52px;height:52px;font-size:22px;border-color:var(--gold)}
+.pod.second .pod-av,.pod.third .pod-av{width:42px;height:42px;font-size:18px}
+.pod.second .pod-av{border-color:#9ca3af}
+.pod.third .pod-av{border-color:#c97c3a}
+.pod-name{font-size:10px;font-weight:600;color:#2a3d2c}
+.pod-pts{font-size:12px;font-weight:700;color:var(--moss)}
+.pod-blk{border-radius:6px 6px 0 0;width:52px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white}
+.pod.first .pod-blk{height:40px;background:var(--gold)}
+.pod.second .pod-blk{height:27px;background:#9ca3af}
+.pod.third .pod-blk{height:19px;background:#c97c3a}
+.lb-list{padding:0 20px 16px}
+.lb-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:.5px solid rgba(0,0,0,.05)}
+.lb-row.me{background:#f0fdf4;border-radius:var(--r);padding:11px 10px;margin:0 -10px;border-bottom:none}
+.lb-n{font-size:13px;font-weight:700;width:20px;color:#aaa;text-align:center}
+.lb-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.lb-det{flex:1}
+.lb-name{font-size:13px;font-weight:600;color:var(--ink)}
+.lb-bdg{font-size:11px;color:#7a8a7a;margin-top:1px}
+.lb-sc{font-size:14px;font-weight:700;color:var(--moss)}
+.you-tag{font-size:9px;background:var(--lime);color:white;border-radius:20px;padding:1px 5px;margin-left:3px;vertical-align:middle}
+
+/* PROFİL */
+.prof-top{background:linear-gradient(155deg,#1a3320,#2d5a3a);padding:24px 22px;text-align:center}
+.prof-av{width:64px;height:64px;border-radius:50%;background:rgba(141,201,138,.2);border:3px solid var(--lime);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 9px}
+.prof-name{font-family:'DM Serif Display',serif;font-size:20px;color:white}
+.prof-lv{font-size:12px;color:var(--lime);margin-top:2px}
+.prof-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.ps{background:rgba(255,255,255,.07);border-radius:var(--r);padding:8px 6px;text-align:center}
+.ps-v{font-size:16px;font-weight:700;color:white}
+.ps-l{font-size:9px;color:rgba(255,255,255,.38);margin-top:1px}
+.cert-sec{padding:16px 20px}
+.cert-card{background:white;border-radius:var(--r2);padding:20px;border:.5px solid rgba(90,154,104,.2);text-align:center;margin-bottom:13px;position:relative;overflow:hidden}
+.cert-card::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='36' height='36' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='18' cy='18' r='1' fill='%235a9a68' opacity='.06'/%3E%3C/svg%3E");background-size:36px 36px}
+.cert-top-row{display:flex;align-items:center;justify-content:center;gap:7px;margin-bottom:11px}
+.cert-logo-txt{font-family:'DM Serif Display',serif;font-size:14px;color:var(--moss)}
+.cert-div{height:1px;background:linear-gradient(90deg,transparent,rgba(90,154,104,.3),transparent);margin-bottom:13px}
+.cert-seal{font-size:36px;margin-bottom:6px}
+.cert-title{font-family:'DM Serif Display',serif;font-size:24px;color:var(--ink);margin-bottom:3px}
+.cert-sub{font-size:12px;color:#7a8a7a;margin-bottom:9px}
+.cert-name{font-family:'DM Serif Display',serif;font-size:19px;color:var(--moss);margin-bottom:7px}
+.cert-body{font-size:12px;color:#2a3d2c;line-height:1.6;margin-bottom:12px}
+.cert-date{font-size:10px;color:#7a8a7a}
+.cert-acts{display:flex;gap:7px;margin-top:11px}
+.ca{flex:1;padding:9px;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;border:none}
+.ca-dl{background:var(--moss);color:white}
+.ca-sh{background:#f0fdf4;color:var(--moss);border:1.5px solid var(--fern)}
+.bdg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.bdg{background:white;border-radius:var(--r);padding:12px 8px;text-align:center;border:.5px solid rgba(90,154,104,.15)}
+.bdg.locked{opacity:.4;filter:grayscale(1)}
+.bdg-i{font-size:22px;margin-bottom:5px}
+.bdg-n{font-size:11px;font-weight:700;color:var(--ink);line-height:1.3}
+.bdg-r{font-size:10px;color:#7a8a7a;margin-top:1px}
+
+/* MAĞAZA */
+.store-top{background:linear-gradient(155deg,#2d1a0d,#4a2f1a);padding:20px 22px 16px}
+.store-title{font-family:'DM Serif Display',serif;font-size:21px;color:white;margin-bottom:2px}
+.store-sub{font-size:12px;color:rgba(255,255,255,.45)}
+.store-body{padding:16px 20px}
+.prod-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.prod{background:white;border-radius:var(--r2);overflow:hidden;border:.5px solid rgba(0,0,0,.06)}
+.prod-img{height:100px;display:flex;align-items:center;justify-content:center;font-size:40px;position:relative}
+.prod-badge{position:absolute;top:6px;left:6px;border-radius:20px;padding:2px 7px;font-size:10px;font-weight:700}
+.dig{background:#ede9fe;color:#4c1d95}
+.phys{background:#fef3c7;color:#78350f}
+.prod-body{padding:10px}
+.prod-name{font-size:12px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.prod-price{display:flex;align-items:center;justify-content:space-between}
+.price-main{font-size:13px;font-weight:700;color:var(--ink)}
+.price-dp{font-size:10px;color:var(--fern);font-weight:600}
+.add-btn{width:100%;padding:8px;background:var(--moss);color:white;border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;margin-top:7px}
+.sp-banner{background:linear-gradient(135deg,#0d1f3a,#1a3260);border-radius:var(--r2);padding:13px 15px;margin-bottom:16px;display:flex;align-items:center;gap:11px}
+.sp-badge-pill{background:rgba(74,144,164,.3);border:1px solid rgba(74,144,164,.5);border-radius:20px;padding:3px 8px;font-size:10px;color:#7dd3fc;font-weight:600;white-space:nowrap}
+.sp-info{flex:1}
+.sp-t{font-size:13px;font-weight:600;color:white;margin-bottom:1px}
+.sp-s{font-size:11px;color:rgba(255,255,255,.45)}
+.sp-play{background:#4a90a4;color:white;border:none;border-radius:9px;padding:8px 12px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
+.notif{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#0d1f0f;color:white;border-radius:var(--r);padding:10px 18px;font-size:13px;font-weight:500;z-index:999;display:none;animation:fin .3s ease;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.notif.show{display:block}
+</style>
+</head>
+<body>
+<div class="phone-frame">
+  <div class="notch"></div>
+  <div class="shell">
+    <div class="sidebar">
+      <div class="logo-mark">🌿</div>
+      <div class="sib-wrap"><button class="sib active" id="sib-home" onclick="nav('home')">🏠</button><div class="sib-label">Ana</div></div>
+      <div class="sib-wrap"><button class="sib" id="sib-catsel" onclick="nav('catsel')">🧠</button><div class="sib-label">Quiz</div></div>
+      <div class="sib-wrap"><button class="sib" id="sib-impact" onclick="nav('impact')">🌍</button><div class="sib-label">Etki</div></div>
+      <div class="sib-wrap"><button class="sib" id="sib-leaders" onclick="nav('leaders')">🏆</button><div class="sib-label">Sıra</div></div>
+      <div class="sib-wrap"><button class="sib" id="sib-profile" onclick="nav('profile')">🎖️</button><div class="sib-label">Profil</div></div>
+      <div class="sib-wrap"><button class="sib" id="sib-store" onclick="nav('store')">🛍️</button><div class="sib-label">Mağaza</div></div>
+    </div>
+    <div class="main">
+
+      <!-- ANA SAYFA -->
+      <div class="page active" id="page-home">
+        <div class="home-top">
+          <div class="eco-brand"><span class="eco-logo">Eco<span>Score</span></span><span class="eco-badge">BETA</span></div>
+          <div class="dp-row"><div class="dp-num" id="dp-display">1.840</div><div><div class="dp-unit">Doğa Puanı</div><div class="dp-sub">Kazanılan DP</div></div></div>
+          <div class="level-row"><div class="level-pill">Seviye 7 — Saha Uzmanı</div><div class="lvl-bar"><div class="lvl-fill"></div></div><div class="lvl-pct">%67</div></div>
+        </div>
+        <div class="home-body">
+          <div class="sec">Etkilerim</div>
+          <div class="impact-row">
+            <div class="imp-card"><div class="imp-icon">🌳</div><div class="imp-val">1</div><div class="imp-lbl">Ağaç dikildi</div></div>
+            <div class="imp-card"><div class="imp-icon">🐾</div><div class="imp-val">0</div><div class="imp-lbl">Hayvan beslendi</div></div>
+            <div class="imp-card"><div class="imp-icon">🌱</div><div class="imp-val">0</div><div class="imp-lbl">Fidan bağışı</div></div>
+          </div>
+          <div class="milestone-box">
+            <div class="ml-label">Sonraki hedef</div>
+            <div class="ml-title">Sokak hayvanlarını besle 🐾</div>
+            <div class="ml-bar"><div class="ml-fill" id="ml-fill" style="width:74%"></div></div>
+            <div class="ml-sub" id="ml-sub">1.840 / 2.500 DP — 660 DP daha gerekiyor</div>
+          </div>
+          <div class="daily-card">
+            <div class="daily-info">
+              <div class="daily-tag">⚡ Günlük Görev</div>
+              <div class="daily-title">Göç Gizemleri</div>
+              <div class="daily-sub">+200 DP bonus • 14:32 kaldı</div>
+            </div>
+            <button class="daily-play" onclick="nav('catsel')">Oyna →</button>
+          </div>
+          <div class="sec">Kategoriler</div>
+          <div class="cat-grid">
+            <button class="cat-btn cb-birds" onclick="selectCat('Kuşlar','🦅')"><span class="cb-icon">🦅</span><span class="cb-name">Kuşlar</span><span class="cb-count">48 soru</span></button>
+            <button class="cat-btn cb-mammals" onclick="selectCat('Memeliler','🦁')"><span class="cb-icon">🦁</span><span class="cb-name">Memeliler</span><span class="cb-count">52 soru</span></button>
+            <button class="cat-btn cb-flora" onclick="selectCat('Flora','🌿')"><span class="cb-icon">🌿</span><span class="cb-name">Flora</span><span class="cb-count">36 soru</span></button>
+            <button class="cat-btn cb-ecology" onclick="selectCat('Ekoloji','🌍')"><span class="cb-icon">🌍</span><span class="cb-name">Ekoloji</span><span class="cb-count">40 soru</span></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KATEGORİ + ZORLUK -->
+      <div class="page" id="page-catsel">
+        <div class="cat-header">
+          <div class="cat-header-title">Kategori Seç</div>
+          <div class="cat-header-sub">Kategori ve zorluk seviyeni belirle</div>
+        </div>
+        <div class="cat-body">
+          <div class="sec">Kategori</div>
+          <div class="cat-grid">
+            <button class="cat-btn cb-birds" onclick="selectCat('Kuşlar','🦅')"><span class="cb-icon">🦅</span><span class="cb-name">Kuşlar</span><span class="cb-count">48 soru</span></button>
+            <button class="cat-btn cb-mammals" onclick="selectCat('Memeliler','🦁')"><span class="cb-icon">🦁</span><span class="cb-name">Memeliler</span><span class="cb-count">52 soru</span></button>
+            <button class="cat-btn cb-flora" onclick="selectCat('Flora','🌿')"><span class="cb-icon">🌿</span><span class="cb-name">Flora</span><span class="cb-count">36 soru</span></button>
+            <button class="cat-btn cb-ecology" onclick="selectCat('Ekoloji','🌍')"><span class="cb-icon">🌍</span><span class="cb-name">Ekoloji</span><span class="cb-count">40 soru</span></button>
+          </div>
+          <div class="diff-box" id="diff-box" style="display:none">
+            <div class="diff-box-title"><span id="ds-icon">🦅</span> <span id="ds-name">Kuşlar</span> — Zorluk Seç</div>
+            <div class="diff-grid">
+              <button class="diff-btn easy" onclick="startQuiz('kolay')"><div class="diff-icon">🟢</div><span class="diff-name">Kolay</span><span class="diff-pts">30 DP/soru</span></button>
+              <button class="diff-btn medium" onclick="startQuiz('orta')"><div class="diff-icon">🟡</div><span class="diff-name">Orta</span><span class="diff-pts">45 DP/soru</span></button>
+              <button class="diff-btn hard" onclick="startQuiz('zor')"><div class="diff-icon">🔴</div><span class="diff-name">Zor</span><span class="diff-pts">65 DP/soru</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUIZ -->
+      <div class="page" id="page-quiz">
+        <div class="quiz-top">
+          <div class="quiz-meta">
+            <div class="quiz-pills">
+              <span class="cat-pill" id="quiz-cat-pill">🦅 Kuşlar</span>
+              <span class="d-pill easy" id="d-pill">Kolay</span>
+            </div>
+            <div class="timer-wrap">
+              <svg width="44" height="44" viewBox="0 0 44 44"><circle class="t-bg" cx="22" cy="22" r="19"/><circle class="t-fill" id="t-circle" cx="22" cy="22" r="19" stroke-dashoffset="0"/></svg>
+              <div class="t-num" id="t-num">15</div>
+            </div>
+          </div>
+          <div class="q-dots" id="q-dots"></div>
+          <div class="score-live"><div class="score-big" id="live-dp">0</div><div class="score-sub">Bu turdaki DP</div></div>
+        </div>
+        <div class="quiz-card">
+          <img class="q-img" id="q-img" src="" alt="" style="display:none" crossorigin="anonymous">
+          <div class="q-img-ph" id="q-ph">🦅</div>
+          <div class="q-body">
+            <span class="q-badge" id="q-badge">📸 Görsel</span>
+            <div class="streak-bar" id="streak-bar">🔥 <span id="streak-txt">Seri aktif!</span></div>
+            <div class="q-text" id="q-text">Soru yükleniyor...</div>
+          </div>
+        </div>
+        <div class="opts" id="opts"></div>
+        <div class="dp-award" id="dp-award">
+          <div style="font-size:24px">⭐</div>
+          <div><div class="award-pts" id="award-pts">+0 DP</div><div class="award-txt" id="award-txt">Doğru!</div><div class="award-form" id="award-form"></div></div>
+        </div>
+        <button class="next-btn" id="next-btn" onclick="nextQ()">Sonraki Soru →</button>
+      </div>
+
+      <!-- ETKİ -->
+      <div class="page" id="page-impact">
+        <div class="impact-top">
+          <div class="impact-title">Gerçek Dünya Etkiniz</div>
+          <div class="impact-sub">Kazandığın her puan değişim yaratıyor</div>
+          <div class="global-grid">
+            <div><div class="gp-val">12.847</div><div class="gp-lbl">Ağaç dikildi</div></div>
+            <div><div class="gp-val">4.291</div><div class="gp-lbl">Hayvan beslendi</div></div>
+            <div><div class="gp-val">1.038</div><div class="gp-lbl">Fidan bağışlandı</div></div>
+          </div>
+        </div>
+        <div class="impact-body">
+          <div class="sec">Etki Hedefleri</div>
+          <div class="threshold-list">
+            <div class="th done"><div class="th-icon">🌳</div><div class="th-body"><div class="th-title">1 Ağaç Dik</div><div class="th-desc">TEMA Vakfı ile Türkiye'ye gerçek fidan.</div><div class="th-pts">1.000 DP</div><div class="th-bar"><div class="th-fill" style="width:100%;background:var(--fern)"></div></div></div><div class="th-stat">✓</div></div>
+            <div class="th next"><div class="th-icon">🐾</div><div class="th-body"><div class="th-title">Sokak Hayvanı Besle</div><div class="th-desc">Yerel barınak ağı ile 1 haftalık yem bağışı.</div><div class="th-pts">2.500 DP</div><div class="th-bar"><div class="th-fill" style="width:74%;background:var(--amber)"></div></div></div><div class="th-stat">%74</div></div>
+            <div class="th"><div class="th-icon">🌱</div><div class="th-body"><div class="th-title">Köy Okulu Bahçesine Fidan</div><div class="th-desc">Türkiye'deki köy okullarına meyve fidanı.</div><div class="th-pts">5.000 DP</div><div class="th-bar"><div class="th-fill" style="width:37%;background:#9ca3af"></div></div></div><div class="th-stat">%37</div></div>
+            <div class="th"><div class="th-icon">🦉</div><div class="th-body"><div class="th-title">Yaralı Yaban Hayvanı Tedavisi</div><div class="th-desc">DKMP ortaklığıyla rehabilitasyon masrafı.</div><div class="th-pts">10.000 DP</div><div class="th-bar"><div class="th-fill" style="width:18%;background:#9ca3af"></div></div></div><div class="th-stat">%18</div></div>
+            <div class="th"><div class="th-icon">🏔️</div><div class="th-body"><div class="th-title">1 Hektar Orman Sahiplen</div><div class="th-desc">OGM ortaklığıyla devlet ormanında tescil.</div><div class="th-pts">25.000 DP</div><div class="th-bar"><div class="th-fill" style="width:7%;background:#9ca3af"></div></div></div><div class="th-stat">%7</div></div>
+          </div>
+          <div class="sec">Etki Günlüğü</div>
+          <div class="log-box">
+            <div class="log-row"><div class="log-ic">🌳</div><div class="log-info"><div class="log-t">Toros Dağlarına 1 ağaç dikildi</div><div class="log-d">18 Mart 2025 · TEMA Vakfı</div></div><div class="log-pts">1.000 DP</div></div>
+            <div class="log-row"><div class="log-ic">📜</div><div class="log-info"><div class="log-t">Sertifika verildi: Doğa Kahramanı</div><div class="log-d">18 Mart 2025</div></div><div class="log-pts">Milestone</div></div>
+            <div class="log-row"><div class="log-ic">⭐</div><div class="log-info"><div class="log-t">EcoScore'a katıldın</div><div class="log-d">1 Mart 2025</div></div><div class="log-pts">+50 DP</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LİDERLİK -->
+      <div class="page" id="page-leaders">
+        <div class="lb-top">
+          <div class="lb-title">🏆 Liderlik Tablosu</div>
+          <div class="lb-tabs">
+            <button class="lb-tab active">Günlük</button>
+            <button class="lb-tab" onclick="this.parentNode.querySelectorAll('.lb-tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">Haftalık</button>
+            <button class="lb-tab" onclick="this.parentNode.querySelectorAll('.lb-tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">Tüm Zamanlar</button>
+          </div>
+        </div>
+        <div class="lb-podium">
+          <div class="pod second"><div class="pod-av" style="background:#e5e7eb">🦅</div><div class="pod-name">DoğaLens</div><div class="pod-pts">3.240</div><div class="pod-blk">2</div></div>
+          <div class="pod first"><div class="pod-av" style="background:#fef3c7">🦁</div><div class="pod-name">VahşiGöz_Ali</div><div class="pod-pts">4.810</div><div class="pod-blk">1</div></div>
+          <div class="pod third"><div class="pod-av" style="background:#dcfce7">🌿</div><div class="pod-name">FloraOdak</div><div class="pod-pts">2.980</div><div class="pod-blk">3</div></div>
+        </div>
+        <div class="lb-list">
+          <div class="lb-row"><div class="lb-n">4</div><div class="lb-av" style="background:#fce7f3">🦋</div><div class="lb-det"><div class="lb-name">BiyoBlitz_Ece</div><div class="lb-bdg">🏅🏅🏅 · 240 DP</div></div><div class="lb-sc">2.410</div></div>
+          <div class="lb-row"><div class="lb-n">5</div><div class="lb-av" style="background:#e0f2fe">🦉</div><div class="lb-det"><div class="lb-name">OrmanlıSes_Mia</div><div class="lb-bdg">🏅🏅 · 180 DP</div></div><div class="lb-sc">2.180</div></div>
+          <div class="lb-row me"><div class="lb-n" style="color:var(--moss)">12</div><div class="lb-av" style="background:#dcfce7">🌿</div><div class="lb-det"><div class="lb-name">Sen <span class="you-tag">SEN</span></div><div class="lb-bdg">🏅🏅🏅 · 1.840 DP</div></div><div class="lb-sc" id="my-sc">1.840</div></div>
+          <div class="lb-row"><div class="lb-n">13</div><div class="lb-av" style="background:#fef3c7">🦒</div><div class="lb-det"><div class="lb-name">Safari_Kerem</div><div class="lb-bdg">🏅 · 95 DP</div></div><div class="lb-sc">1.720</div></div>
+        </div>
+      </div>
+
+      <!-- PROFİL -->
+      <div class="page" id="page-profile">
+        <div class="prof-top">
+          <div class="prof-av">🌿</div>
+          <div class="prof-name">Doğa Kaşifi</div>
+          <div class="prof-lv">Seviye 7 · Saha Uzmanı · #12</div>
+          <div class="prof-stats">
+            <div class="ps"><div class="ps-v" id="stat-dp">1.840</div><div class="ps-l">Toplam DP</div></div>
+            <div class="ps"><div class="ps-v">%87</div><div class="ps-l">Doğruluk</div></div>
+            <div class="ps"><div class="ps-v">124</div><div class="ps-l">Yanıtlandı</div></div>
+            <div class="ps"><div class="ps-v">14</div><div class="ps-l">Gün serisi</div></div>
+          </div>
+        </div>
+        <div class="cert-sec">
+          <div class="sec" style="margin-bottom:10px">Sertifika</div>
+          <div class="cert-card">
+            <div class="cert-top-row"><span>🌿</span><span class="cert-logo-txt">EcoScore</span></div>
+            <div class="cert-div"></div>
+            <div class="cert-seal">🏅</div>
+            <div class="cert-title">Doğa Kahramanı</div>
+            <div class="cert-sub">Başarı Sertifikası</div>
+            <div class="cert-name">Doğa Kaşifi</div>
+            <div class="cert-body">Bu belge; doğal dünya hakkında üstün bilgi sergilediğini ve EcoScore platformu aracılığıyla gerçek dünya çevre etkisine katkıda bulunduğunu onaylar.</div>
+            <div class="cert-date">18 Mart 2025 · EcoScore Platformu</div>
+            <div class="cert-acts">
+              <button class="ca ca-dl" onclick="notify('⬇️ İndirildi!')">⬇ PNG İndir</button>
+              <button class="ca ca-sh" onclick="notify('📤 Paylaşıldı!')">↗ Paylaş</button>
+            </div>
+          </div>
+          <div class="sec" style="margin-bottom:10px">Rozetler</div>
+          <div class="bdg-grid">
+            <div class="bdg"><div class="bdg-i">🦅</div><div class="bdg-n">Kuş Uzmanı</div><div class="bdg-r">20 soru ✓</div></div>
+            <div class="bdg"><div class="bdg-i">🔥</div><div class="bdg-n">Sıcak Seri</div><div class="bdg-r">10 üst üste ✓</div></div>
+            <div class="bdg"><div class="bdg-i">🌳</div><div class="bdg-n">Ağaç Dikici</div><div class="bdg-r">1.000 DP ✓</div></div>
+            <div class="bdg locked"><div class="bdg-i">🦉</div><div class="bdg-n">Orman Bekçisi</div><div class="bdg-r">10 flora sorusu</div></div>
+            <div class="bdg locked"><div class="bdg-i">🌍</div><div class="bdg-n">Natüralist</div><div class="bdg-r">Tüm kategoriler</div></div>
+            <div class="bdg locked"><div class="bdg-i">👑</div><div class="bdg-n">İlk 10</div><div class="bdg-r">Sıralama 10</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAĞAZA -->
+      <div class="page" id="page-store">
+        <div class="store-top">
+          <div class="store-title">Eko Mağaza 🛍️</div>
+          <div class="store-sub">Doğayı destekle — her alışveriş etki yaratır</div>
+        </div>
+        <div class="store-body">
+          <div class="sp-banner"><div class="sp-badge-pill">SPONSOR</div><div class="sp-info"><div class="sp-t">WWF Türkiye — Nisan Quiz'i</div><div class="sp-s">Tamamla · WWF 2× ağaç fonluyor</div></div><button class="sp-play" onclick="nav('catsel')">Oyna</button></div>
+          <div class="sec">Dijital</div>
+          <div class="prod-grid" style="margin-bottom:16px">
+            <div class="prod"><div class="prod-img" style="background:linear-gradient(135deg,#dbeafe,#ede9fe)">🦅<span class="prod-badge dig">Dijital</span></div><div class="prod-body"><div class="prod-name">Kartal Duvar Kağıdı</div><div class="prod-price"><span class="price-main">149 ₺</span><span class="price-dp">veya 200 DP</span></div><button class="add-btn" onclick="notify('🛒 Sepete eklendi!')">Sepete ekle</button></div></div>
+            <div class="prod"><div class="prod-img" style="background:linear-gradient(135deg,#dcfce7,#d1fae5)">🌿<span class="prod-badge dig">Dijital</span></div><div class="prod-body"><div class="prod-name">Orman Paketi 12 Görsel</div><div class="prod-price"><span class="price-main">399 ₺</span><span class="price-dp">veya 500 DP</span></div><button class="add-btn" onclick="notify('🛒 Sepete eklendi!')">Sepete ekle</button></div></div>
+          </div>
+          <div class="sec">Fiziksel</div>
+          <div class="prod-grid">
+            <div class="prod"><div class="prod-img" style="background:linear-gradient(135deg,#fef3c7,#fde68a)">👜<span class="prod-badge phys">Fiziksel</span></div><div class="prod-body"><div class="prod-name">Doğa Bez Çantası</div><div class="prod-price"><span class="price-main">549 ₺</span><span class="price-dp">+50 DP</span></div><button class="add-btn" onclick="notify('🛒 Sepete eklendi!')">Sepete ekle</button></div></div>
+            <div class="prod"><div class="prod-img" style="background:linear-gradient(135deg,#fce7f3,#fbcfe8)">🖼️<span class="prod-badge phys">Fiziksel</span></div><div class="prod-body"><div class="prod-name">Yaban Hayatı Baskısı</div><div class="prod-price"><span class="price-main">1.350 ₺</span><span class="price-dp">+200 DP</span></div><button class="add-btn" onclick="notify('🛒 Sepete eklendi!')">Sepete ekle</button></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div class="notif" id="notif"></div>
+
+<script>
+const QS={Kuşlar:{kolay:[{img:'https://picsum.photos/seed/eagle1/480/160',q:'Kartallar ve şahinler hangi kuş grubuna girer?',opts:['Yırtıcı Kuşlar','Su Kuşları','Ötücüler','Koşucular'],ans:0,type:'🧠 Bilgi'},{img:'https://picsum.photos/seed/hummingbird/480/160',q:'Hangi kuş havada yerinde durarak uçabilir?',opts:['Sinekkuşu','Guguk Kuşu','Serçe','İbibik'],ans:0,type:'🧠 Bilgi'},{img:'https://picsum.photos/seed/flamingo1/480/160',q:'Flamingolar neden pembe renktedir?',opts:['Doğuştan böyle doğar','Yedikleri yosun ve karides','Güneş etkisi','Su rengi'],ans:1,type:'🧠 Bilgi'},{img:'https://picsum.photos/seed/owl22/480/160',q:'Hangi kuş gece görüşüyle ünlüdür?',opts:['Baykuş','Kartal','Papağan','Leylek'],ans:0,type:'🧠 Bilgi'},{img:'https://picsum.photos/seed/stork1/480/160',q:'Leylek kışları nereye göç eder?',opts:['Kuzey Avrupa','Güney ve Orta Afrika','Orta Asya','Avustralya'],ans:1,type:'🗺️ Göç'}],orta:[{img:'https://picsum.photos/seed/raptor2/480/160',q:'Bir yırtıcı kuşun dalış hızı yaklaşık kaç km/s olabilir?',opts:['80 km/s','150 km/s','300 km/s','500 km/s'],ans:2,type:'🔬 Bilim'},{img:'https://picsum.photos/seed/bird_nest/480/160',q:"Türkiye'de hangi kuş nesli tehlike altındadır?",opts:['Kara Leylek','Güvercin','Bıldırcın','Saksağan'],ans:0,type:'🇹🇷 Türkiye'},{img:'https://picsum.photos/seed/bird_fly/480/160',q:'Kuşların yön bulmasında hangi mekanizma rol oynar?',opts:['Yalnızca koku','Manyetik alan ve yıldız konumu','Yalnızca güneş','Rüzgar yönü'],ans:1,type:'🔬 Bilim'},{img:'https://picsum.photos/seed/pelican1/480/160',q:"Tepeli pelikan Türkiye'de en çok nerede ürer?",opts:['Karadeniz','Gediz Deltası','İç Anadolu','Doğu Anadolu'],ans:1,type:'🇹🇷 Türkiye'},{img:'https://picsum.photos/seed/migration/480/160',q:'Hangi kuş en uzun göç rotasına sahiptir?',opts:['Güvercin','Kutup Martısı','Leylek','Kırlangıç'],ans:1,type:'🗺️ Göç'}],zor:[{img:'https://picsum.photos/seed/eagle_rare/480/160',q:"Türkiye'nin hangi bölgesi en fazla yırtıcı kuş çeşidine ev sahipliği yapar?",opts:['Trakya','Karadeniz','Doğu Anadolu','Ege'],ans:2,type:'🇹🇷 Uzman'},{img:'https://picsum.photos/seed/bird_rare1/480/160',q:"Hangi kuş türü Türkiye'de yalnızca Gediz Deltası'nda ürer?",opts:['Küçük Flamingo','Tepeli Pelikan','Ak Pelikan','Bataklık Kırlangıcı'],ans:1,type:'🇹🇷 Uzman'},{img:'https://picsum.photos/seed/bird_adapt/480/160',q:"Bir şahinin dalış hızı kaç km/s'e ulaşabilir?",opts:['180','250','320','390'],ans:2,type:'🔬 Bilim'},{img:'https://picsum.photos/seed/feather1/480/160',q:'Kuş tüylerindeki "barbül" ne işe yarar?',opts:['Renk verir','Tüyleri kilitler','Isı yalıtımı','Su iter'],ans:1,type:'🔬 Bilim'},{img:'https://picsum.photos/seed/bird_song/480/160',q:'Kuşların şarkı söylemesi öncelikle ne için gelişmiştir?',opts:['İletişim kurmak','Bölge işaretlemek ve eş çekmek','Avlanmak','Uyarı vermek'],ans:1,type:'🔬 Bilim'}]},Memeliler:{kolay:[{img:'https://picsum.photos/seed/bat1/480/160',q:'Hangi memeli gerçek anlamda uçabilir?',opts:['Yarasa','Uçan Sincap','Sugar Glider','Colugo'],ans:0,type:'🧠 Bilgi'},{img:'https://picsum.photos/seed/elephant1/480/160',q:'Filler kaç ay hamile kalır?',opts:['9 ay','14 ay','22 ay','3 yıl'],ans:2,type:'🧠 Bilgi'},{img:'https://picsum.photos/seed/hippo1/480/160',q:'Hangi memeli hem karada hem suda yaşayabilir?',opts:['Su Aygırı','Kurt','Fil','Zebra'],ans:0,type:'🧠 Bilgi'},{img:'https://picsum.photos/seed/wolf1/480/160',q:"Türkiye'de hangi büyük yırtıcı memeli yaşamaktadır?",opts:['Asya Aslanı','Kurt ve Çakal','Kaplan','Leopar'],ans:1,type:'🇹🇷 Türkiye'},{img:'https://picsum.photos/seed/mammal1/480/160',q:'Yarasalar yön bulmak için ne kullanır?',opts:['Manyetik Alan','Ekolokasyon','Görme','Koku'],ans:1,type:'🧠 Bilgi'}],orta:[{img:'https://picsum.photos/seed/seal_med/480/160',q:"Akdeniz foku Türkiye'de en çok nerede görülür?",opts:['Karadeniz','Marmara','Ege ve Akdeniz mağaraları','Boğaz'],ans:2,type:'🇹🇷 Türkiye'},{img:'https://picsum.photos/seed/lynx1/480/160',q:"Hangisi Türkiye'ye özgü bir memeli alt türüdür?",opts:['Anadolu Vaşağı','Orman Faresi','Hamster','Kurt'],ans:0,type:'🇹🇷 Türkiye'},{img:'https://picsum.photos/seed/wolf_pack/480/160',q:'Bir kurt sürüsü ortalama kaç bireyden oluşur?',opts:['2-3','5-10','15-20','30+'],ans:1,type:'🔬 Bilim'},{img:'https://picsum.photos/seed/bear1/480/160',q:"Türkiye'de boz ayı hangi bölgelerde yaşar?",opts:['Karadeniz ve Doğu Anadolu dağları','Ege kıyıları','Akdeniz sahili','İç Anadolu ovası'],ans:0,type:'🇹🇷 Türkiye'},{img:'https://picsum.photos/seed/mammal_track/480/160',q:'Hangi memelinin kalp-damar sistemi en güçlüdür?',opts:['Fil','Zürafa','Balina','Çita'],ans:1,type:'🔬 Bilim'}],zor:[{img:'https://picsum.photos/seed/rare_mammal/480/160',q:'Akdeniz foku dünyada kaç bireyden oluşan bir popülasyona sahiptir?',opts:['~100','~700','~3.000','~10.000'],ans:1,type:'🔬 Bilim'},{img:'https://picsum.photos/seed/wolf_terr/480/160',q:'Bir kurt ailesinin bölgesi kaç km² olabilir?',opts:['10','50','200','600'],ans:2,type:'🔬 Bilim'},{img:'https://picsum.photos/seed/mammal_eco/480/160',q:"Türkiye'de \"Önemli Memeli Alanı\" statüsünde kaç bölge var?",opts:['5','12','25','40'],ans:2,type:'🇹🇷 Uzman'},{img:'https://picsum.photos/seed/dolphin_tr/480/160',q:"Türkiye denizlerinde hangi yunus türü en sık görülür?",opts:['Şişe Burunlu Yunus','Adi Yunus','Gri Yunus','Şeritli Yunus'],ans:1,type:'🇹🇷 Uzman'},{img:'https://picsum.photos/seed/bear_adapt/480/160',q:'Hibernasyon sırasında ayıların vücut sıcaklığı ne kadar düşer?',opts:['1-5°C','10-15°C','20-25°C','Hiç düşmez'],ans:0,type:'🔬 Bilim'}]},Flora:{kolay:[{img:'https://picsum.photos/seed/flower1/480/160',q:'Fotosentez nedir?',opts:["Bitkilerin güneşten besin üretmesi","Bitkilerin nefes alması","Tohumun çimlenmesi","Köklerin su emişi"],ans:0,type:'🧠 Bilgi'},{img:'https://picsum.photos/seed/pine1/480/160',q:'Hangi ağaç kışın yapraklarını dökmez?',opts:['Çam','Meşe','Kavak','Kiraz'],ans:0,type:'🧠 Bilgi'},{img:'https://picsum.photos/seed/tulip1/480/160',q:"Türkiye'nin simgesi olan hangi çiçek Anadolu kökenlidir?",opts:['Lale','Gül','Papatya','Zambak'],ans:0,type:'🇹🇷 Türkiye'},{img:'https://picsum.photos/seed/venus1/480/160',q:'Hangi bitki böcek yakalayarak beslenir?',opts:['Venüs Sinek Kapanı','Ayçiçeği','Orkide','Lale'],ans:0,type:'🧠 Bilgi'},{img:'https://picsum.photos/seed/forest1/480/160',q:'Ormanlara "Dünyanın akciğerleri" denmesinin nedeni nedir?',opts:['Oksijen üretirler','Su depolarlar','Toprağı korurlar','Hayvan barındırırlar'],ans:0,type:'🧠 Bilgi'}],orta:[{img:'https://picsum.photos/seed/endemic_plant/480/160',q:"Türkiye'de yaklaşık kaç endemik bitki türü vardır?",opts:['500','3.000','10.000','200'],ans:1,type:'🇹🇷 Türkiye'},{img:'https://picsum.photos/seed/olive1/480/160',q:'Zeytin ağacı kaç yıl yaşayabilir?',opts:['50 yıl','200 yıl','1.000 yıl üzeri','10 yıl'],ans:2,type:'🧠 Bilgi'},{img:'https://picsum.photos/seed/mycorrhiza/480/160',q:'Mikoriza nedir?',opts:['Bitki hastalığı','Mantar-kök ortaklığı','Böcek zararlısı','Toprak minerali'],ans:1,type:'🔬 Bilim'},{img:'https://picsum.photos/seed/pine2/480/160',q:'Fıstık çamı hangi bölgede doğal olarak yetişir?',opts:['Karadeniz','İç Anadolu','Akdeniz kıyıları','Doğu Anadolu'],ans:2,type:'🇹🇷 Türkiye'},{img:'https://picsum.photos/seed/pollen1/480/160',q:"Arıların polenleme görevi neden kritiktir?",opts:['Bal üretimi için','Bitkilerin üremesini sağlar','Toprağı güçlendirir','Zararlıları uzaklaştırır'],ans:1,type:'🔬 Bilim'}],zor:[{img:'https://picsum.photos/seed/kazdag/480/160',q:"Kazdağları'nda koruma altındaki endemik ağaç türü hangisidir?",opts:['Kazdağı Göknarı','Sedir','Meşe','Kayın'],ans:0,type:'🇹🇷 Uzman'},{img:'https://picsum.photos/seed/rafflesia/480/160',q:"Rafflesia arnoldii'nin boyutu ne kadardır?",opts:['10 cm','50 cm','1 metreye kadar','3 metre'],ans:2,type:'🔬 Bilim'},{img:'https://picsum.photos/seed/plant_adapt/480/160',q:'Tuz bataklıklarında yaşayan bitkilere ne ad verilir?',opts:['Kserofit','Halofit','Hidrofit','Mezofit'],ans:1,type:'🔬 Bilim'},{img:'https://picsum.photos/seed/bristlecone/480/160',q:'Dünyanın en yaşlı ağacı Methuselah kaç yaşındadır?',opts:['~1.000','~2.500','~4.800','~10.000'],ans:2,type:'🔬 Bilim'},{img:'https://picsum.photos/seed/turkey_forest/480/160',q:"Türkiye'nin orman örtüsü yüzde kaçtır?",opts:['%10','%16','%28','%42'],ans:2,type:'🇹🇷 Uzman'}]},Ekoloji:{kolay:[{img:'https://picsum.photos/seed/food_chain/480/160',q:'Gıda zincirinde enerji hangi yönde akar?',opts:['Üreticiden tüketiciye','Tüketiciden üreticiye','Her iki yönde','Döngüsel'],ans:0,type:'🧠 Bilgi'},{img:'https://picsum.photos/seed/biodiversity/480/160',q:'Biyoçeşitlilik ne demektir?',opts:['Farklı türlerin zenginliği','Bir türün çokluğu','Bitki sayısı','Deniz derinliği'],ans:0,type:'🧠 Bilgi'},{img:'https://picsum.photos/seed/climate1/480/160',q:'İklim değişikliğinin en temel göstergesi nedir?',opts:['Küresel sıcaklık artışı','Nüfus artışı','Orman yangınları','Şehirleşme'],ans:0,type:'🧠 Bilgi'},{img:'https://picsum.photos/seed/wetland1/480/160',q:'Sulak alanların ekosistemdeki temel işlevi nedir?',opts:['Su arıtma ve biyoçeşitlilik','Tarım alanı','Şehir parkı','Sanayi bölgesi'],ans:0,type:'🧠 Bilgi'},{img:'https://picsum.photos/seed/decomp1/480/160',q:'Besin döngüsünde ayrıştırıcı görevi kimler üstlenir?',opts:['Bakteri ve mantarlar','Bitkiler','Yırtıcılar','Otçullar'],ans:0,type:'🧠 Bilgi'}],orta:[{img:'https://picsum.photos/seed/ramsar1/480/160',q:"Türkiye'de kaç Ramsar sulak alan statüsünde bölge vardır?",opts:['5','14','30','50'],ans:1,type:'🇹🇷 Türkiye'},{img:'https://picsum.photos/seed/keystone/480/160',q:'Kilit taş (keystone) tür ne demektir?',opts:['En çok sayıda tür','Ekosistemin dengesini koruyan tür','En büyük tür','Tehlikeli tür'],ans:1,type:'🔬 Bilim'},{img:'https://picsum.photos/seed/habitat/480/160',q:'Habitat tahribatının başlıca nedeni nedir?',opts:['Tarım arazisine dönüşüm','Doğal afet','İklim değişikliği','Su baskını'],ans:0,type:'🔬 Bilim'},{img:'https://picsum.photos/seed/taurus_eco/480/160',q:'Toros Dağları ekolojik açıdan neden kritiktir?',opts:['Tatlı su kaynakları ve endemizm','Turizm geliri','Tarım alanları','Maden rezervleri'],ans:0,type:'🇹🇷 Türkiye'},{img:'https://picsum.photos/seed/carbon1/480/160',q:'Karbon döngüsünde ormanlar hangi rolü oynar?',opts:['Karbon depolayıcı','Karbon salan','Nötr','İkisi de'],ans:0,type:'🔬 Bilim'}],zor:[{img:'https://picsum.photos/seed/koycegiz/480/160',q:"Türkiye'deki en büyük Özel Çevre Koruma Bölgesi hangisidir?",opts:['Köyceğiz-Dalyan','Göksu Deltası','Gediz Deltası','Belek'],ans:0,type:'🇹🇷 Uzman'},{img:'https://picsum.photos/seed/footprint1/480/160',q:'Ekolojik ayak izi hesaplamasında en büyük pay kime aittir?',opts:['Su tüketimi','Karbon emisyonu','Arazi kullanımı','Madencilik'],ans:1,type:'🔬 Bilim'},{img:'https://picsum.photos/seed/megadiversity/480/160',q:'Türkiye neden "megabiyoçeşitlilik" ülkesi sayılır?',opts:['Üç iklim bölgesi ve iki kıta geçiş noktası','Sahil uzunluğu','Nüfus yoğunluğu','Ekonomik büyüklük'],ans:0,type:'🇹🇷 Uzman'},{img:'https://picsum.photos/seed/invasive1/480/160',q:'İstilacı tür ekosistemlere nasıl zarar verir?',opts:['Yerli türlerle rekabet ederek biyoçeşitliği düşürür','Toprağı güçlendirir','Besin döngüsünü hızlandırır','Diğer türleri besler'],ans:0,type:'🔬 Bilim'},{img:'https://picsum.photos/seed/trophic/480/160',q:'Trofik basamak (trophic level) ne ifade eder?',opts:['Gıda zincirindeki enerji aktarım kademesi','Bir türün nüfusu','Habitat büyüklüğü','Üreme hızı'],ans:0,type:'🔬 Bilim'}]}};
+const BASE={kolay:30,orta:45,zor:65};
+const D_LABEL={kolay:'Kolay',orta:'Orta',zor:'Zor'};
+const D_CLASS={kolay:'easy',orta:'medium',zor:'hard'};
+let selCat='Kuşlar',selDiff='kolay',selIcon='🦅',curQ=0,roundDP=0,streak=0,timer=null,timeLeft=15,answered=false,totalDP=1840,activeQs=[];
+function nav(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.sib').forEach(s=>s.classList.remove('active'));document.getElementById('page-'+id).classList.add('active');const s=document.getElementById('sib-'+id);if(s)s.classList.add('active');}
+function selectCat(cat,icon){selCat=cat;selIcon=icon;document.getElementById('ds-icon').textContent=icon;document.getElementById('ds-name').textContent=cat;const db=document.getElementById('diff-box');db.style.display='block';setTimeout(()=>db.scrollIntoView({behavior:'smooth',block:'nearest'}),50);nav('catsel');}
+function startQuiz(diff){selDiff=diff;activeQs=[...QS[selCat][diff]].sort(()=>Math.random()-.5);curQ=0;roundDP=0;streak=0;answered=false;document.getElementById('d-pill').textContent=D_LABEL[diff];document.getElementById('d-pill').className='d-pill '+D_CLASS[diff];document.getElementById('quiz-cat-pill').textContent=selIcon+' '+selCat;document.getElementById('live-dp').textContent=0;nav('quiz');renderQ();}
+function renderQ(){const q=activeQs[curQ%activeQs.length];answered=false;document.getElementById('q-badge').textContent=q.type;document.getElementById('q-text').textContent=q.q;document.getElementById('live-dp').textContent=roundDP;document.getElementById('dp-award').classList.remove('show');document.getElementById('next-btn').classList.remove('show');const img=document.getElementById('q-img'),ph=document.getElementById('q-ph');img.style.display='none';ph.style.display='flex';ph.textContent=selIcon;img.onload=()=>{img.style.display='block';ph.style.display='none';};img.onerror=()=>{img.style.display='none';ph.style.display='flex';};img.src=q.img;const sb=document.getElementById('streak-bar');if(streak>=2){sb.style.display='flex';document.getElementById('streak-txt').textContent=streak+'× Seri! Kombo aktif';}else{sb.style.display='none';}const dots=document.getElementById('q-dots');dots.innerHTML='';const tot=Math.min(activeQs.length,5);for(let i=0;i<tot;i++){const d=document.createElement('div');d.className='q-dot'+(i<curQ?' done':i===curQ?' cur':'');dots.appendChild(d);}const grid=document.getElementById('opts');grid.innerHTML='';['A','B','C','D'].forEach((l,i)=>{const b=document.createElement('button');b.className='opt';b.innerHTML=`<span class="opt-ltr">${l}</span>${q.opts[i]}`;b.onclick=()=>pick(i,q.ans,BASE[selDiff]);grid.appendChild(b);});startTimer();}
+function startTimer(){clearInterval(timer);timeLeft=15;const c=document.getElementById('t-circle'),n=document.getElementById('t-num');c.style.strokeDashoffset=0;c.style.stroke='#8dc98a';n.textContent=15;timer=setInterval(()=>{timeLeft--;n.textContent=timeLeft;c.style.strokeDashoffset=(1-timeLeft/15)*120;if(timeLeft<=5)c.style.stroke='#e05c3a';if(timeLeft<=0){clearInterval(timer);timeUp();}},1000);}
+function timeUp(){if(answered)return;answered=true;clearInterval(timer);streak=0;const bs=document.querySelectorAll('.opt');bs[activeQs[curQ%activeQs.length].ans].classList.add('correct');bs.forEach(b=>b.disabled=true);showAward(0,'Süre doldu!','');document.getElementById('next-btn').classList.add('show');}
+function pick(chosen,correct,base){if(answered)return;answered=true;clearInterval(timer);const bs=document.querySelectorAll('.opt');bs.forEach(b=>b.disabled=true);const spd=Math.max(1,+(1+(timeLeft/15)*.5).toFixed(2));if(chosen===correct){bs[chosen].classList.add('correct');streak++;const sb=streak>=3?1.3:streak>=2?1.15:1;const earn=Math.round(base*spd*sb);roundDP+=earn;totalDP+=earn;document.getElementById('live-dp').textContent=roundDP;document.getElementById('dp-display').textContent=totalDP.toLocaleString('tr-TR');document.getElementById('stat-dp').textContent=totalDP.toLocaleString('tr-TR');document.getElementById('my-sc').textContent=totalDP.toLocaleString('tr-TR');updateMilestone();showAward(earn,`Doğru! Hız ×${spd} · Seri ×${sb.toFixed(2)}`,`${base} × ${spd} × ${sb.toFixed(2)} = ${earn} DP`);}else{bs[chosen].classList.add('wrong');bs[correct].classList.add('correct');streak=0;showAward(0,'Yanlış. Doğru cevap işaretlendi.','');}document.getElementById('next-btn').classList.add('show');}
+function showAward(pts,txt,form){const el=document.getElementById('dp-award');document.getElementById('award-pts').textContent=pts>0?`+${pts} DP`:'0 DP';document.getElementById('award-txt').textContent=txt;document.getElementById('award-form').textContent=form;el.classList.add('show');}
+function nextQ(){curQ++;if(curQ>=Math.min(activeQs.length,5)){notify('🎉 Tur bitti! +'+roundDP+' DP kazandın!');setTimeout(()=>nav('home'),1400);return;}renderQ();}
+function updateMilestone(){const pct=Math.min(100,Math.round((totalDP/2500)*100));document.getElementById('ml-fill').style.width=pct+'%';const left=Math.max(0,2500-totalDP);document.getElementById('ml-sub').textContent=totalDP.toLocaleString('tr-TR')+' / 2.500 DP — '+left+' DP daha gerekiyor';}
+function notify(msg){const n=document.getElementById('notif');n.textContent=msg;n.classList.add('show');setTimeout(()=>n.classList.remove('show'),2600);}
+</script>
+</body>
+</html>
